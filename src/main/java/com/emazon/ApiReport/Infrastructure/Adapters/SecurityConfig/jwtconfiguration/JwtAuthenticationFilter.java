@@ -1,0 +1,99 @@
+package com.emazon.ApiReport.Infrastructure.Adapters.SecurityConfig.jwtconfiguration;
+
+import com.emazon.ApiReport.Application.Response.UserResponse;
+import com.emazon.ApiReport.Domain.Spi.UserJwtPort;
+import com.emazon.ApiReport.Infrastructure.Adapters.Feign.IUserFeign;
+import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter implements UserJwtPort {
+
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private final IUserFeign userFeign;
+
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
+        final String token = getTokenFromRequest(request);
+        final String username;
+
+        if (token==null)
+        {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        username = jwtService.extractUserId(token);
+
+        if (username!=null && SecurityContextHolder.getContext().getAuthentication()==null)
+        {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            if (jwtService.isTokenValid(token, userDetails))
+            {
+                UsernamePasswordAuthenticationToken authToken= new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String getTokenFromRequest(HttpServletRequest request) {
+        final String authHeader=request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if(StringUtils.hasText(authHeader) && authHeader.startsWith(InfraConstants.BEARER))
+        {
+            return authHeader.substring(InfraConstants.SEVEN);
+        }
+        return null;
+    }
+
+    @Override
+    public String extractUserId() {
+        String token = jwtService.getTokenFromRequest();
+
+        return token != null ? jwtService.extractUserId(token) : null;
+    }
+
+    @Override
+    public String extractEmail(long id) {
+        UserResponse userResponse = getUserById(String.valueOf(id));
+        return userResponse != null ? userResponse.getEmail() : null;
+    }
+
+
+    public UserResponse getUserById(String id) {
+        return userFeign.getUserById(id);
+    }
+}
+
+
