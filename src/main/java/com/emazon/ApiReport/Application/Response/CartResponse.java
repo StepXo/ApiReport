@@ -1,5 +1,6 @@
 package com.emazon.ApiReport.Application.Response;
 
+import com.emazon.ApiReport.Application.Request.ItemAuxDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

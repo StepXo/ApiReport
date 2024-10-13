@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = AppConstants.SPRING)
 public interface SaleHandler {
-    @Mapping(target = "items", ignore = true)
+    @Mapping(target = AppConstants.ITEMS, ignore = true)
     SaleResponse toResponse(Sale sale);
 }

@@ -1,5 +1,8 @@
 package com.emazon.ApiReport.Infrastructure.Adapters.SecurityConfig.jwtconfiguration;
 
+import com.emazon.ApiReport.Application.Response.UserResponse;
+import com.emazon.ApiReport.Domain.Spi.UserJwtPort;
+import com.emazon.ApiReport.Infrastructure.Adapters.Feign.IUserFeign;
 import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,10 +24,11 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter implements UserJwtPort {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final IUserFeign userFeign;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -62,6 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
     private String getTokenFromRequest(HttpServletRequest request) {
         final String authHeader=request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -70,6 +75,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return authHeader.substring(InfraConstants.SEVEN);
         }
         return null;
+    }
+
+    @Override
+    public String extractUserId() {
+        String token = jwtService.getTokenFromRequest();
+
+        return token != null ? jwtService.extractUserId(token) : null;
+    }
+
+    @Override
+    public String extractEmail(long id) {
+        UserResponse userResponse = getUserById(String.valueOf(id));
+        return userResponse != null ? userResponse.getEmail() : null;
+    }
+
+
+    public UserResponse getUserById(String id) {
+        return userFeign.getUserById(id);
     }
 }
 

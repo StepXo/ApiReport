@@ -7,6 +7,7 @@ import com.emazon.ApiReport.Application.Response.CartResponse;
 import com.emazon.ApiReport.Domain.Model.Cart;
 import com.emazon.ApiReport.Domain.Spi.CartFeignPort;
 import com.emazon.ApiReport.Infrastructure.Persistance.Mapper.ItemMapper;
+import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
 import lombok.AllArgsConstructor;
 
 import javax.swing.plaf.basic.BasicComboBoxUI;
@@ -19,7 +20,11 @@ public class CartFeign implements CartFeignPort {
 
     @Override
     public Cart getCart(){
-        CartResponse cartResponse = feign.getCart("asc",0,10).getBody();
+        CartResponse cartResponse = feign
+                .getCart(InfraConstants.CART_REQUEST,
+                        InfraConstants.PAGE,
+                        InfraConstants.SIZE).getBody();
+
         Cart cart = cartMapper.tocart(cartResponse);
         cart.setItem(cartResponse.getItem()
                 .getContent()

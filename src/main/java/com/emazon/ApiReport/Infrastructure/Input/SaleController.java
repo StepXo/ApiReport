@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.emazon.ApiReport.Infrastructure.Utils.InfraConstants.BUY;
+
 @RestController
-@RequestMapping("/buy")
+@RequestMapping(BUY)
 @RequiredArgsConstructor
 public class SaleController {
     private final SaleService saleService;

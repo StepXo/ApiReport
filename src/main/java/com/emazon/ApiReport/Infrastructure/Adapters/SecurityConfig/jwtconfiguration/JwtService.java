@@ -1,25 +1,28 @@
 package com.emazon.ApiReport.Infrastructure.Adapters.SecurityConfig.jwtconfiguration;
 
-import com.emazon.ApiReport.Infrastructure.Adapters.Feign.IUserFeign;
+import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.Key;
 import java.util.function.Function;
 
 @Service
-@AllArgsConstructor
-public class JwtService {
+public class JwtService  {
 
     @Value("${jwt.secret.key}")
     private String secretKey;
+
+
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -47,7 +50,6 @@ public class JwtService {
         return (userId.equals(String.valueOf(userDetails.getUsername())));
     }
 
-
     private Claims extractAllClaims(String token) throws SignatureException {
         try {
             return Jwts
@@ -60,6 +62,17 @@ public class JwtService {
             e.printStackTrace();
             return Jwts.claims();
         }
+    }
+    public String getTokenFromRequest() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String authHeader = request.getHeader(InfraConstants.AUTHORIZATION);
+            if (authHeader != null && authHeader.startsWith(InfraConstants.BEARER)) {
+                return authHeader.substring(7);
+            }
+        }
+        return null;
     }
 }
 

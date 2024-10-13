@@ -1,7 +1,6 @@
 package com.emazon.ApiReport.Infrastructure.ExceptionHandler;
 
-import com.emazon.ApiReport.Domain.Exeptions.ItemNotFoundException;
-import com.emazon.ApiReport.Domain.Exeptions.QuantityIsNotEnough;
+import com.emazon.ApiReport.Domain.Exeptions.*;
 import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,11 +23,17 @@ public class ControllerErrorDecoder implements ErrorDecoder {
             JsonNode errorBody = objectMapper.readTree(response.body().asInputStream());
             String errorMessage = errorBody.path(InfraConstants.MESSAGE).asText();
             if (errorMessage.contains(InfraConstants.ITEM_NOT_FOUND)) {
-                return new ItemNotFoundException();
+                return new ItemNotFoundException(InfraConstants.ITEM_NOT_FOUND);
             } else if (errorMessage.contains(InfraConstants.QUANTITY_IS_NOT_ENOUGH)) {
-                System.out.println(errorMessage);
                 return new QuantityIsNotEnough(errorMessage);
-            } else {
+            } else if(errorMessage.contains(InfraConstants.INVALID_USER)) {
+                return new InvalidUserException();
+            } else if(errorMessage.contains(InfraConstants.CART_IS_NULL)){
+                return new CartIsNullException();
+            } else if(errorMessage.contains(InfraConstants.CART_IS_EMPTY)){
+                return new EmptyCartException();
+            }
+            else{
                 return new BadRequestException();
             }
 

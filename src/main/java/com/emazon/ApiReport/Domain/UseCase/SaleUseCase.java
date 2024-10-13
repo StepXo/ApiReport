@@ -1,15 +1,19 @@
 package com.emazon.ApiReport.Domain.UseCase;
 
 import com.emazon.ApiReport.Domain.Api.SaleServicePort;
+import com.emazon.ApiReport.Domain.Exeptions.ItemNotFoundException;
 import com.emazon.ApiReport.Domain.Exeptions.QuantityIsNotEnough;
 import com.emazon.ApiReport.Domain.Model.Item;
 import com.emazon.ApiReport.Domain.Model.Sale;
 import com.emazon.ApiReport.Domain.Model.Cart;
 import com.emazon.ApiReport.Domain.Spi.*;
+import com.emazon.ApiReport.Domain.Utils.Validations;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.emazon.ApiReport.Domain.Utils.DomConstants.ZERO;
 
 public class SaleUseCase implements SaleServicePort {
     private final SalePersistencePort salePersistencePort;
@@ -29,49 +33,42 @@ public class SaleUseCase implements SaleServicePort {
 
     @Override
     public Sale sale() {
-        Sale sale = new Sale();
-        List<Long> itemsNotFound = new ArrayList<>();
-        List<Long> itemsWithNoStock = new ArrayList<>();
 
         String user = userJwt.extractUserId();
+        Validations.validate(user);
         long userId = Long.parseLong(user);
-
         String email = userJwt.extractEmail(userId);
+
         Cart cart = cartFeignPort.getCart();
-        List<Long> items =  new ArrayList<>();
-        List<Long> quantities =  new ArrayList<>();
-        List<Double> prices =  new ArrayList<>();
+        Validations.validate(cart,email);
 
         List<Integer> stockValidation = stockFeignPort.updateStock(cart.getItem());
-
-        for (int i = 0; i <= stockValidation.size()  ; i++) {
-
-            if (stockValidation.get(i) == 1) {
-                itemsNotFound.add(cart.getItem().get(i).getId());
-            }
-            if (stockValidation.get(i) == 2) {
-                itemsWithNoStock.add(cart.getItem().get(i).getId());
-            }
-        }
-        if (itemsNotFound.isEmpty()) {
-            throw new RuntimeException("The following items were not found in stock: " + itemsNotFound);
-        }
-        if (!itemsWithNoStock.isEmpty()) {
-            String errorMessage = transactionFeignPort.getErrorMessage(itemsWithNoStock);
+        List<Long> stock = Validations.validate(cart, stockValidation);
+        if (!stock.isEmpty()) {
+            String errorMessage = transactionFeignPort.getErrorMessage(stock);
             throw new QuantityIsNotEnough(errorMessage);
         }
 
-        sale.setUserId(userId);
-        sale.setEmail(email);
+        List<Long> items =  new ArrayList<>();
+        List<Long> quantities =  new ArrayList<>();
+        List<Double> prices =  new ArrayList<>();
+        for (int i = ZERO; i < stockValidation.size()  ; i++) {
+            items.add(cart.getItem().get(i).getId());
+            quantities.add(cart.getItem().get(i).getQuantity());
+            prices.add(cart.getItem().get(i).getPrice());
+        }
 
-        sale.setItems(items);
-        sale.setQuantity(quantities);
-        sale.setPrice(prices);
-
-        sale.setTotal(cart.getTotal());
-        sale.setDate(LocalDate.now().toString());
+        Sale sale = Sale.builder()
+                .setUserId(userId)
+                .setEmail(email)
+                .setItems(items)
+                .setQuantity(quantities)
+                .setPrice(prices)
+                .setTotal(cart.getTotal())
+                .setDate(LocalDate.now().toString()).build();
 
         cartFeignPort.deleteItems();
         return salePersistencePort.saveSale(sale);
     }
+
 }

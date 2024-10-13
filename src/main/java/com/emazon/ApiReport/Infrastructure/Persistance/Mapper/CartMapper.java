@@ -6,8 +6,11 @@ import com.emazon.ApiReport.Domain.Model.Cart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = AppConstants.SPRING)
+import static com.emazon.ApiReport.Infrastructure.Utils.InfraConstants.ITEM;
+import static com.emazon.ApiReport.Infrastructure.Utils.InfraConstants.SPRING;
+
+@Mapper(componentModel = SPRING)
 public interface CartMapper {
-    @Mapping(target = "item", ignore = true)
+    @Mapping(target = ITEM, ignore = true)
     Cart tocart(CartResponse sale);
 }

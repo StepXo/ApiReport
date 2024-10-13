@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "ApiTransaction", url = "http://localhost:9092/transaction",configuration = FeignConfiguration.class)
+@FeignClient(name = InfraConstants.TRANSACTION_API, url = "${transaction.api.url}",configuration = FeignConfiguration.class)
 public interface ITransactionFeign extends TransactionFeignPort {
 
     default String getErrorMessage(List<Long> itemsId){
         return checkDates(itemsId).getBody();
     }
 
-    @GetMapping(value = "/date/",consumes = {MediaType.APPLICATION_JSON_VALUE},produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = InfraConstants.GET_SUPPLY,consumes = {MediaType.APPLICATION_JSON_VALUE},produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity<String> checkDates(
             @RequestParam List<Long> id);
 

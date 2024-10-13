@@ -2,19 +2,17 @@ package com.emazon.ApiReport.Infrastructure.Adapters.Feign;
 
 
 
-import com.emazon.ApiReport.Application.Response.ItemAuxDto;
-import com.emazon.ApiReport.Application.Response.UserResponse;
+import com.emazon.ApiReport.Application.Request.ItemAuxDto;
 import com.emazon.ApiReport.Infrastructure.Configuration.FeignConfiguration;
 import com.emazon.ApiReport.Infrastructure.Utils.InfraConstants;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "Api-Stock", url = "http://localhost:9091/item",configuration = FeignConfiguration.class)
+@FeignClient(name = InfraConstants.STOCK_API, url = "${stock.api.url}",configuration = FeignConfiguration.class)
 public interface IStockFeign {
 
 

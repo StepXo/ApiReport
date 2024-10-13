@@ -1,4 +1,4 @@
-package com.emazon.ApiReport.Application.Response;
+package com.emazon.ApiReport.Application.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

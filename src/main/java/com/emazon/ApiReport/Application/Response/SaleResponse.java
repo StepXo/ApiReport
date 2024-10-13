@@ -1,6 +1,6 @@
 package com.emazon.ApiReport.Application.Response;
 
-import com.emazon.ApiReport.Domain.Model.Item;
+import com.emazon.ApiReport.Application.Request.ItemAuxDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class SaleResponse {
     long id;
     long userId;
     String email;
-    List<ItemAuxDto> items;
-    double total;
+    List<ItemResponse> items;
+    Double total;
     String date;
 }

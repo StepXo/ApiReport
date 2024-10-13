@@ -17,20 +17,7 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleItemNotFoundException(
             ItemNotFoundException itemNotFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Collections.singletonMap(InfraConstants.MESSAGE, ExceptionResponse.ITEM_NOT_FOUND.getMessage()));
-    }
-
-    @ExceptionHandler(InvalidItemException.class)
-    public ResponseEntity<Map<String, String>> invalidItemException(
-            InvalidItemException invalidItemException) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Collections.singletonMap(InfraConstants.MESSAGE, ExceptionResponse.INVALID_ITEM.getMessage()));
-    }
-    @ExceptionHandler(InvalidQuantityException.class)
-    public ResponseEntity<Map<String, String>> invalidQuantityException(
-            InvalidQuantityException invalidQuantityException) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Collections.singletonMap(InfraConstants.MESSAGE, ExceptionResponse.INVALID_QUANTITY.getMessage()));
+                .body(Collections.singletonMap(InfraConstants.MESSAGE, ExceptionResponse.ITEM_NOT_FOUND.getMessage() + itemNotFoundException.getMessage()));
     }
     @ExceptionHandler(InvalidUserException.class)
     public ResponseEntity<Map<String, String>> invalidUserException(

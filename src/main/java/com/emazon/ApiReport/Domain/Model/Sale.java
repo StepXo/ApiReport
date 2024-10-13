@@ -1,5 +1,7 @@
 package com.emazon.ApiReport.Domain.Model;
 
+import com.emazon.ApiReport.Domain.Utils.SaleBuilder;
+
 import java.util.List;
 
 public class Sale {
@@ -12,15 +14,18 @@ public class Sale {
     double total;
     String date;
 
-    public Sale(long id, long userId, String email, List<Long> items, List<Long> quantity, List<Double> price, double total, String date) {
-        this.id = id;
-        this.userId = userId;
-        this.email = email;
-        this.items = items;
-        this.quantity = quantity;
-        this.price = price;
-        this.total = total;
-        this.date = date;
+    public Sale(SaleBuilder builder) {
+        this.id = builder.getId();
+        this.userId = builder.getUserId();
+        this.email = builder.getEmail();
+        this.items = builder.getItems();
+        this.quantity = builder.getQuantity();
+        this.price = builder.getPrice();
+        this.total = builder.getTotal();
+        this.date = builder.getDate();
+    }
+    public static SaleBuilder builder() {
+        return new SaleBuilder();
     }
 
     public Sale() {
