@@ -14,6 +14,7 @@ import java.util.List;
 public class ItemAuxDto {
     private long id;
     private String name;
+    private String description;
     private long quantity;
     private long stock;
     private double price;

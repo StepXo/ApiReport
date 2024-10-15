@@ -48,26 +48,18 @@ public class SaleUseCase implements SaleServicePort {
             String errorMessage = transactionFeignPort.getErrorMessage(stock);
             throw new QuantityIsNotEnough(errorMessage);
         }
-
-        List<Long> items =  new ArrayList<>();
-        List<Long> quantities =  new ArrayList<>();
-        List<Double> prices =  new ArrayList<>();
-        for (int i = ZERO; i < stockValidation.size()  ; i++) {
-            items.add(cart.getItem().get(i).getId());
-            quantities.add(cart.getItem().get(i).getQuantity());
-            prices.add(cart.getItem().get(i).getPrice());
-        }
+        List<Item> items =  cart.getItem();
 
         Sale sale = Sale.builder()
                 .setUserId(userId)
                 .setEmail(email)
                 .setItems(items)
-                .setQuantity(quantities)
-                .setPrice(prices)
                 .setTotal(cart.getTotal())
-                .setDate(LocalDate.now().toString()).build();
+                .setDate(LocalDate.now().toString())
+                .build();
 
-        cartFeignPort.deleteItems();
+        cartFeignPort.deleteItems(); //to do: User could not buy all items
+
         return salePersistencePort.saveSale(sale);
     }
 

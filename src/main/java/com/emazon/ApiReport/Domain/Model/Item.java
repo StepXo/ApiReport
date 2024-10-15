@@ -5,7 +5,9 @@ import java.util.List;
 public class Item {
     private long id;
     private String name;
+    private String description;
     private long quantity;
+    private long stock;
     private double price;
     private List<Category> category;
     private Brand brand;
@@ -30,6 +32,14 @@ public class Item {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public long getStock() {
+        return stock;
+    }
+
     public long getQuantity() {
         return quantity;
     }
@@ -52,6 +62,14 @@ public class Item {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStock(long stock) {
+        this.stock = stock;
     }
 
     public void setQuantity(long quantity) {
