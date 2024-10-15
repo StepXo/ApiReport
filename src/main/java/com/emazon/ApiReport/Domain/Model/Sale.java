@@ -8,9 +8,7 @@ public class Sale {
     long id;
     long userId;
     String email;
-    List<Long> items;
-    List<Long> quantity;
-    List<Double> price;
+    List<Item> items;
     double total;
     String date;
 
@@ -19,8 +17,6 @@ public class Sale {
         this.userId = builder.getUserId();
         this.email = builder.getEmail();
         this.items = builder.getItems();
-        this.quantity = builder.getQuantity();
-        this.price = builder.getPrice();
         this.total = builder.getTotal();
         this.date = builder.getDate();
     }
@@ -43,17 +39,10 @@ public class Sale {
         return email;
     }
 
-    public List<Long> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public List<Long> getQuantity() {
-        return quantity;
-    }
-
-    public List<Double> getPrice() {
-        return price;
-    }
 
     public double getTotal() {
         return total;
@@ -75,16 +64,8 @@ public class Sale {
         this.email = email;
     }
 
-    public void setItems(List<Long> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
-    }
-
-    public void setQuantity(List<Long> quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setPrice(List<Double> price) {
-        this.price = price;
     }
 
     public void setTotal(double total) {
